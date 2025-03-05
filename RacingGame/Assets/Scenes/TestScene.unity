@@ -24275,7 +24275,7 @@ MonoBehaviour:
   motorTorque: 2000
   brakeTorque: 2000
   maxSpeed: 20
-  steeringRange: 30
+  steeringRange: 50
   steeringRangeAtMaxSpeed: 10
   centreOfGravityOffset: -1
   vInput: 0

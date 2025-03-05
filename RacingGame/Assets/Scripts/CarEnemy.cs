@@ -32,7 +32,7 @@ public class CarEnemy : MonoBehaviour
     [SerializeField] private float playerDistanceOffset;
     public Terrain terrainCarIsIn;
     public Terrain[] terrains;
-    bool left;
+    float lookAtRotation;
 
     // Start is called before the first frame update
     void Start()
@@ -51,17 +51,21 @@ public class CarEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y - transform.rotation.eulerAngles.y);
-        if(Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y - transform.rotation.y > 180)
+        
+        lookAtRotation = Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y;
+
+        if(360 + transform.rotation.eulerAngles.y - lookAtRotation < lookAtRotation - transform.rotation.eulerAngles.y)
         {
-            left = true;
+            hInput = -360 - transform.rotation.eulerAngles.y + Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y;
         }
         else
         {
-            left = false;
+            hInput = Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y - transform.rotation.eulerAngles.y;
         }
 
-        hInput = left ? hInput = -1 : hInput = 1;
+        Debug.Log("Look at: " + Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y + " Current: " + transform.rotation.eulerAngles.y + " hInput: " + hInput);
+        hInput = Mathf.Clamp(hInput, -1, 1);
+
         // hInput = Mathf.Lerp(hInput, 0, Mathf.Abs(Vector3.Dot(transform.forward, player.transform.forward)));
         distanceToPlayer = Vector3.Distance(new Vector3(player.transform.position.x, 0, player.transform.position.z), new Vector3(transform.position.x, 0, transform.position.z));
         if(forwardSpeed > distanceToPlayer)
@@ -85,6 +89,7 @@ public class CarEnemy : MonoBehaviour
             TeleportToPlayer();
         }
 
+        IfStuck();
         ObstacleAvoidance();
         
 
@@ -150,9 +155,9 @@ public class CarEnemy : MonoBehaviour
         transform.position = new Vector3(player.transform.position.x - player.transform.forward.x * teleportOffset, terrainCarIsIn.SampleHeight(transform.position) + terrainCarIsIn.transform.position.y + 2, player.transform.position.z - player.transform.forward.z * teleportOffset);
     }
 
-    void ObstacleAvoidance()
+    void IfStuck()
     {
-        if(forwardSpeed < 0.1f)
+        if(forwardSpeed < 0.5f)
         {
             time += Time.deltaTime;
             if(time > 2)
@@ -176,6 +181,21 @@ public class CarEnemy : MonoBehaviour
         {
             time = 0;
             vInput = 1;
+        }
+    }
+
+    void ObstacleAvoidance()
+    {
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position, transform.forward, out hit, 10))
+        {
+            Debug.Log(hit.collider.gameObject.name);
+            if(hit.collider.gameObject.tag != "Player")
+            {
+                vInput = -1;
+                hInput = -hInput * 1;
+                hInput = Mathf.Clamp(hInput, -1, 1);
+            }
         }
     }
 }
