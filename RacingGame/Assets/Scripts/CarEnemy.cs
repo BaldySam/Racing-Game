@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class CarEnemy : MonoBehaviour
 {
+    public Transform rPoint;
+    public Transform lPoint;
+    public Transform mPoint;
+
+
     public float motorTorque = 2000;
     public float brakeTorque = 2000;
     public float maxSpeed = 20;
@@ -33,6 +38,8 @@ public class CarEnemy : MonoBehaviour
     public Terrain terrainCarIsIn;
     public Terrain[] terrains;
     float lookAtRotation;
+    float carRotation;
+    float oppositeCarRotation;
 
     // Start is called before the first frame update
     void Start()
@@ -53,18 +60,39 @@ public class CarEnemy : MonoBehaviour
     {
         
         lookAtRotation = Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y;
+        carRotation = transform.rotation.eulerAngles.y;
+        oppositeCarRotation = carRotation > 180 ? carRotation - 180 : carRotation + 180;
 
-        if(360 + transform.rotation.eulerAngles.y - lookAtRotation < lookAtRotation - transform.rotation.eulerAngles.y)
+        // if(lookAtRotation > carRotation || lookAtRotation < oppositeCarRotation)
+        // {
+        //     hInput = 1;
+        // }
+        // else
+        // {
+        //     hInput = -1;
+        // }
+
+        float mDistance = Vector3.Distance(mPoint.position, player.transform.position);
+        float lDistance = Vector3.Distance(lPoint.position, player.transform.position);
+        float rDistance = Vector3.Distance(rPoint.position, player.transform.position);
+
+        if (mDistance < lDistance && mDistance < rDistance)
         {
-            hInput = -360 - transform.rotation.eulerAngles.y + Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y;
+            hInput = 0;
+        }
+        else if (lDistance < rDistance)
+        {
+            hInput = -1;
         }
         else
         {
-            hInput = Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y - transform.rotation.eulerAngles.y;
+            hInput = 1;
         }
 
-        Debug.Log("Look at: " + Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y + " Current: " + transform.rotation.eulerAngles.y + " hInput: " + hInput);
-        hInput = Mathf.Clamp(hInput, -1, 1);
+        hInput = Mathf.Lerp(hInput, hInput, Time.deltaTime * 2);
+
+
+        Debug.Log("Car Rotation: " + carRotation + " Opposite Car Rotation: " + oppositeCarRotation + " Look At Rotation: " + lookAtRotation + " H Input: " + hInput);
 
         // hInput = Mathf.Lerp(hInput, 0, Mathf.Abs(Vector3.Dot(transform.forward, player.transform.forward)));
         distanceToPlayer = Vector3.Distance(new Vector3(player.transform.position.x, 0, player.transform.position.z), new Vector3(transform.position.x, 0, transform.position.z));
