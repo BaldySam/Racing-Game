@@ -1,104 +1,62 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarEnemy : MonoBehaviour
 {
-    public Transform rPoint;
-    public Transform lPoint;
-    public Transform mPoint;
-
-
-    public float motorTorque = 2000;
-    public float brakeTorque = 2000;
-    public float maxSpeed = 20;
-    public float steeringRange = 30;
-    public float steeringRangeAtMaxSpeed = 10;
-    public float centreOfGravityOffset = -1f;
-
-    public float vInput;
-    public float hInput;
-
-    public float forwardSpeed;
-    public float speedFactor;
-    public float currentMotorTorque;
-    public float currentSteerRange;
-    public bool isAccelerating;
-
-    public float decelerationMultiplier;
-
-    public GameObject player;
-    public float distanceToPlayer;
-
-    WheelControl[] wheels;
-    Rigidbody rigidBody;
-    bool hitObject;
-    public float time;
+    [Header("Rubber Banding")]
     [SerializeField] private float teleportOffset;
     [SerializeField] private float playerDistanceOffset;
     public Terrain terrainCarIsIn;
     public Terrain[] terrains;
-    float lookAtRotation;
-    float carRotation;
-    float oppositeCarRotation;
+
+    [Header("Obstacle Avoidance")]
+    [SerializeField] private Transform raycastPointLeft;
+    [SerializeField] private Transform raycastPointRight;
+    [SerializeField] private Transform raycastPointCentre;
+    [SerializeField] private float obstacleDistance;
+    
+    [Header("Damage")]
+    public float damageMultiplier;
+    private float AngleToPlayer;
+    private GameObject player;
+    public float time;
+    private bool hitObject;
+    private UnityEngine.Vector3 VectorToPlayer;
+    private CarControl carControl;
+    private float hInput;
+    private float vInput;
+    private float distanceToPlayer;
+    public bool leftHit;
+    public bool rightHit;
+    public bool centreHit;
+    public Transform[] lastObjectHit = new Transform[3];
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        rigidBody = GetComponent<Rigidbody>();
-
-        // Adjust center of mass vertically, to help prevent the car from rolling
-        rigidBody.centerOfMass += Vector3.up * centreOfGravityOffset;
-
-        // Find all child GameObjects that have the WheelControl script attached
-        wheels = GetComponentsInChildren<WheelControl>();
         terrains = Terrain.activeTerrains;
+        carControl = GetComponent<CarControl>();
+        lastObjectHit[0] = new GameObject().transform;
+        lastObjectHit[1] = new GameObject().transform;
+        lastObjectHit[2] = new GameObject().transform;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        lookAtRotation = Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y;
-        carRotation = transform.rotation.eulerAngles.y;
-        oppositeCarRotation = carRotation > 180 ? carRotation - 180 : carRotation + 180;
+        SteerInDirectionOfPlayer();
+        RubberBanding();
+        ObstacleAvoidance();
+        carControl.hInput = hInput;
+        carControl.vInput = vInput;
+    }
 
-        // if(lookAtRotation > carRotation || lookAtRotation < oppositeCarRotation)
-        // {
-        //     hInput = 1;
-        // }
-        // else
-        // {
-        //     hInput = -1;
-        // }
-
-        float mDistance = Vector3.Distance(mPoint.position, player.transform.position);
-        float lDistance = Vector3.Distance(lPoint.position, player.transform.position);
-        float rDistance = Vector3.Distance(rPoint.position, player.transform.position);
-
-        if (mDistance < lDistance && mDistance < rDistance)
-        {
-            hInput = 0;
-        }
-        else if (lDistance < rDistance)
-        {
-            hInput = -1;
-        }
-        else
-        {
-            hInput = 1;
-        }
-
-        hInput = Mathf.Lerp(hInput, hInput, Time.deltaTime * 2);
-
-
-        Debug.Log("Car Rotation: " + carRotation + " Opposite Car Rotation: " + oppositeCarRotation + " Look At Rotation: " + lookAtRotation + " H Input: " + hInput);
-
-        // hInput = Mathf.Lerp(hInput, 0, Mathf.Abs(Vector3.Dot(transform.forward, player.transform.forward)));
+    void RubberBanding()
+    {
         distanceToPlayer = Vector3.Distance(new Vector3(player.transform.position.x, 0, player.transform.position.z), new Vector3(transform.position.x, 0, transform.position.z));
-        if(forwardSpeed > distanceToPlayer)
+        if(carControl.forwardSpeed > distanceToPlayer)
         {
-            if(forwardSpeed - distanceToPlayer > 5)
+            if(carControl.forwardSpeed - distanceToPlayer > 5)
             {
                 vInput = -1;
             }
@@ -116,56 +74,15 @@ public class CarEnemy : MonoBehaviour
         {
             TeleportToPlayer();
         }
+    }
 
-        IfStuck();
-        ObstacleAvoidance();
-        
+    void SteerInDirectionOfPlayer()
+    {
+        VectorToPlayer = player.transform.position - transform.position;
 
-        // Calculate current speed in relation to the forward direction of the car
-        // (this returns a negative number when traveling backwards)
-        forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
+        AngleToPlayer = Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y) / 10;
 
-        // Calculate how close the car is to top speed
-        // as a number from zero to one
-        speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
-
-        // Use that to calculate how much torque is available 
-        // (zero torque at top speed)
-        currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
-
-        // …and to calculate how much to steer 
-        // (the car steers more gently at top speed)
-        currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
-
-        // Check whether the user input is in the same direction 
-        // as the car's velocity
-        isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
-
-        foreach (var wheel in wheels)
-        {
-            // Apply steering to Wheel colliders that have "Steerable" enabled
-            if (wheel.steerable)
-            {
-                wheel.WheelCollider.steerAngle = hInput * currentSteerRange;
-            }
-            
-            if (isAccelerating)
-            {
-                // Apply torque to Wheel colliders that have "Motorized" enabled
-                if (wheel.motorized)
-                {
-                    wheel.WheelCollider.motorTorque = vInput * currentMotorTorque;
-                }
-                wheel.WheelCollider.brakeTorque = 0;
-            }
-            else
-            {
-                // If the user is trying to go in the opposite direction
-                // apply brakes to all wheels
-                wheel.WheelCollider.brakeTorque = Mathf.Abs(vInput) * brakeTorque;
-                wheel.WheelCollider.motorTorque = 0;
-            }
-        }
+        hInput = Mathf.Clamp(AngleToPlayer, -1, 1);
     }
 
     void TeleportToPlayer()
@@ -183,47 +100,116 @@ public class CarEnemy : MonoBehaviour
         transform.position = new Vector3(player.transform.position.x - player.transform.forward.x * teleportOffset, terrainCarIsIn.SampleHeight(transform.position) + terrainCarIsIn.transform.position.y + 2, player.transform.position.z - player.transform.forward.z * teleportOffset);
     }
 
-    void IfStuck()
+    void ObstacleAvoidance()
     {
-        if(forwardSpeed < 0.5f)
+        float raycastDistanceMultiplier = Mathf.Abs(carControl.forwardSpeed) + 5f;
+        Debug.DrawRay(raycastPointLeft.position, raycastPointLeft.forward * raycastDistanceMultiplier, Color.red);
+        RaycastHit hitLeft;
+        if(Physics.Raycast(raycastPointLeft.position, raycastPointLeft.forward, out hitLeft, raycastDistanceMultiplier))
         {
-            time += Time.deltaTime;
-            if(time > 2)
+            if(hitLeft.collider.gameObject.tag != "IgnoreObstacleAvoidance")
             {
-                vInput = -1;
-                hInput = -hInput;
-                if(forwardSpeed > -0.1f && time > 2.5f)
-                {
-                    time = 0;
-                    vInput = 1;
-                }
-                if(time > 3)
-                {
-                    time = 0;
-                    vInput = 1;
-                }
-
+                leftHit = true;
+                vInput = 0.1f;
+                lastObjectHit[0] = hitLeft.transform;
+            }
+            else
+            {
+                leftHit = false;
             }
         }
         else
         {
-            time = 0;
-            vInput = 1;
+            leftHit = false;
         }
+
+        Debug.DrawRay(raycastPointRight.position, raycastPointRight.forward * raycastDistanceMultiplier, Color.blue);
+        RaycastHit hitRight;
+        if(Physics.Raycast(raycastPointRight.position, raycastPointRight.forward, out hitRight, raycastDistanceMultiplier))
+        {
+            if(hitRight.collider.gameObject.tag != "IgnoreObstacleAvoidance")
+            {
+                rightHit = true;
+                vInput = 0.1f;
+                lastObjectHit[1] = hitRight.transform;
+            }
+            else
+            {
+                rightHit = false;
+            }
+        }
+        else
+        {
+            rightHit = false;
+        }
+
+        if(rightHit && !leftHit)
+        {
+            hInput = -1;
+        }
+        else if(leftHit && !rightHit)
+        {
+            hInput = 1;
+        }
+        else if(rightHit && leftHit)
+        {
+            if(Vector3.Distance(hitRight.point, raycastPointRight.position) < Vector3.Distance(hitLeft.point, raycastPointLeft.position))
+            {
+                hInput = -1;
+            }
+            else if(Vector3.Distance(hitRight.point, raycastPointRight.position) > Vector3.Distance(hitLeft.point, raycastPointLeft.position))
+            {
+                hInput = 1;
+            }
+        }
+
+        Debug.DrawRay(raycastPointCentre.position, raycastPointCentre.forward * raycastDistanceMultiplier, Color.green);
+        RaycastHit hitCentre;
+        if(Physics.Raycast(raycastPointCentre.position, raycastPointCentre.forward, out hitCentre, raycastDistanceMultiplier))
+        {
+            if(hitCentre.collider.gameObject.tag != "IgnoreObstacleAvoidance")
+            {
+                centreHit = true;
+                vInput = 0.1f;
+                lastObjectHit[2] = hitCentre.transform;
+            }
+            else
+            {
+                centreHit = false;
+            }
+        }
+        else
+        {
+            centreHit = false;
+        }
+
+        CheckIfCarIsStationary();
     }
 
-    void ObstacleAvoidance()
+    void CheckIfCarIsStationary()
     {
-        RaycastHit hit;
-        if(Physics.Raycast(transform.position, transform.forward, out hit, 10))
+        if(carControl.forwardSpeed < 1)
         {
-            Debug.Log(hit.collider.gameObject.name);
-            if(hit.collider.gameObject.tag != "Player")
+            time += Time.deltaTime;
+        }
+        else
+        {
+            time = 0;
+        }
+
+        if(time > 1)
+        {
+            if(rightHit || leftHit || centreHit || Vector3.Distance(lastObjectHit[0].position, transform.position) < obstacleDistance || Vector3.Distance(lastObjectHit[1].position, transform.position) < obstacleDistance || Vector3.Distance(lastObjectHit[2].position, transform.position) < obstacleDistance)
             {
                 vInput = -1;
-                hInput = -hInput * 1;
-                hInput = Mathf.Clamp(hInput, -1, 1);
+                hInput = -hInput;
             }
+        }
+
+        if(vInput == -1 && time > 4)
+        {
+            hInput = -hInput;
+            vInput = 1;
         }
     }
 }

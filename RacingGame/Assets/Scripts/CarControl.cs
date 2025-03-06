@@ -20,11 +20,8 @@ public class CarControl : MonoBehaviour
 
     public float decelerationMultiplier;
 
-    WheelControl[] wheels;
-    Rigidbody rigidBody;
-
-    [SerializeField] private Transform steeringWheel;
-    float time;
+    private WheelControl[] wheels;
+    private Rigidbody rigidBody;
 
     // Start is called before the first frame update
     void Start()
@@ -41,12 +38,6 @@ public class CarControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        hInput = Input.GetAxisRaw("Horizontal");
-        vInput  = Input.GetAxisRaw("Vertical");
-
-        // steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x, steeringWheel.localEulerAngles.y, Mathf.Clamp(Mathf.SmoothStep(steeringWheel.localEulerAngles.z, -hInput * 90, Time.deltaTime * 5) , -90, 90));
-        steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x, Quaternion.Slerp(steeringWheel.localRotation, Quaternion.Euler(0, hInput * 90, 0), Time.deltaTime * 5).eulerAngles.y, steeringWheel.localEulerAngles.z);
-
         // Calculate current speed in relation to the forward direction of the car
         // (this returns a negative number when traveling backwards)
         forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
