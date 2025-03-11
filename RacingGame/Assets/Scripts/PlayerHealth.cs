@@ -9,11 +9,13 @@ public class PlayerHealth : MonoBehaviour
     private float enemySpeedOnCollision;
     public float playerMaxHealth = 100;
     public float playerCurrentHealth;
+    private CarControl carControl;
 
     // Start is called before the first frame update
     void Start()
     {
         healthBar.maxValue = playerMaxHealth;
+        carControl = transform.GetComponent<CarControl>();
     }
 
     // Update is called once per frame
@@ -33,7 +35,7 @@ public class PlayerHealth : MonoBehaviour
         if(collision.gameObject.tag == "Enemy")
         {
             enemySpeedOnCollision = collision.gameObject.GetComponent<CarControl>().forwardSpeed;
-            playerCurrentHealth -= Mathf.Abs(enemySpeedOnCollision * collision.gameObject.GetComponent<CarEnemy>().damageMultiplier);
+            playerCurrentHealth += Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * collision.gameObject.GetComponent<CarEnemy>().damageMultiplier);
         }
     }
 }

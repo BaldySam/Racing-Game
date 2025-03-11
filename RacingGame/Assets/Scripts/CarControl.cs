@@ -58,6 +58,8 @@ public class CarControl : MonoBehaviour
         // as the car's velocity
         isAccelerating = true;
 
+        currentMotorTorque = motorTorque;
+
         foreach (var wheel in wheels)
         {
             // Apply steering to Wheel colliders that have "Steerable" enabled
