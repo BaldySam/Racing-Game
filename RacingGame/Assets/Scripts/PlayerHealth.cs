@@ -34,7 +34,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if(collision.gameObject.tag == "Enemy")
         {
-            enemySpeedOnCollision = collision.gameObject.GetComponent<CarControl>().forwardSpeed;
+            enemySpeedOnCollision = collision.gameObject.GetComponent<CarEnemy>().forwardSpeed;
             playerCurrentHealth += Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * collision.gameObject.GetComponent<CarEnemy>().damageMultiplier);
         }
     }

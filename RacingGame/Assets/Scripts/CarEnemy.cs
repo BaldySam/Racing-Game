@@ -20,7 +20,6 @@ public class CarEnemy : MonoBehaviour
     private Rigidbody rigidBody;
     [Header("References")]
     private GameObject player;
-    private CarControl carControl;
 
     [Header("Inputs")]
     private float hInput;
@@ -42,7 +41,6 @@ public class CarEnemy : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        carControl = GetComponent<CarControl>();
         agent = agentObject.GetComponent<NavMeshAgent>();
 
         rigidBody = GetComponent<Rigidbody>();
@@ -61,84 +59,126 @@ public class CarEnemy : MonoBehaviour
         }
 
         forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
-        // if(Mathf.Abs(forwardSpeed) < 0.5f || reversing)
-        // {
-        //     time += Time.deltaTime;
-        //     if(time > 1)
-        //     {
-        //         reversing = true;
-        //         currentMotorTorque = -motorTorque;
-        //         currentBrakeTorque = 0;
-        //         hInput = -hInput;
-        //         if(time > 3)
-        //         {
-        //             reversing = false;
-        //             time = 0;
-        //             currentMotorTorque = motorTorque;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         if(Mathf.Abs(hInput) > 5)
-        //         {
-        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
-        //         }
-        //         else if(Mathf.Abs(hInput) > 30)
-        //         {
-        //             currentMotorTorque = motorTorque / 2;
-        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
-        //         }
-        //         else if(Mathf.Abs(hInput) > 40)
-        //         {
-        //             currentMotorTorque = motorTorque / 5;
-        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
-        //         }
-        //         else
-        //         {
-        //             currentMotorTorque = motorTorque;
-        //             currentBrakeTorque = 0;
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     time = 0;
-        //     if(Mathf.Abs(hInput) > 5)
-        //     {
-        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
-        //     }
-        //     else if(Mathf.Abs(hInput) > 30)
-        //     {
-        //         currentMotorTorque = motorTorque / 2;
-        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
-        //     }
-        //     else if(Mathf.Abs(hInput) > 40)
-        //     {
-        //         currentMotorTorque = motorTorque / 5;
-        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
-        //     }
-        //     else
-        //     {
-        //         currentMotorTorque = motorTorque;
-        //     }
-        // }
+        if(Mathf.Abs(forwardSpeed) < 0.1f || reversing)
+        {
+            time += Time.deltaTime;
+            if(time > 1)
+            {
+                reversing = true;
+                currentMotorTorque = -motorTorque;
+                currentBrakeTorque = 0;
+                hInput = -hInput;
+                if(time > 3)
+                {
+                    reversing = false;
+                    time = 0;
+                    currentMotorTorque = motorTorque;
+                }
+            }
+            else
+            {
+                if(Mathf.Abs(hInput) > 5)
+                {
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
+                }
+                else if(Mathf.Abs(hInput) > 30)
+                {
+                    currentMotorTorque = motorTorque / 2;
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
+                }
+                else if(Mathf.Abs(hInput) > 40)
+                {
+                    currentMotorTorque = motorTorque / 5;
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+                }
+                else
+                {
+                    currentMotorTorque = motorTorque;
+                    currentBrakeTorque = 0;
+                }
+            }
+        }
+        else
+        {
+            reversing = false;
+            time = 0;
+            if(forwardSpeed > 10 || forwardSpeed < -10)
+            {
+                if(Mathf.Abs(hInput) > 5)
+                {
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
+                }
+                else if(Mathf.Abs(hInput) > 30)
+                {
+                    currentMotorTorque = motorTorque / 2;
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
+                }
+                else if(Mathf.Abs(hInput) > 40)
+                {
+                    currentMotorTorque = motorTorque / 5;
+                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+                }
+                else
+                {
+                    currentMotorTorque = motorTorque;
+                    currentBrakeTorque = 0;
+                }
+            }
+            else
+            {
+                currentMotorTorque = motorTorque;
+                currentBrakeTorque = 0;
+            }
+        }
         DriveCar();
     }
 
     void FixedUpdate()
     {
         agent.SetDestination(player.transform.position);
+        // if(agent.path.corners.Length > 2)
+        // {
+        //     Debug.Log(agent.path.corners.Length);
+        //     float distanceToFirstCorner = Vector3.Distance(transform.position, agent.path.corners[1]);
+        //     if(distanceToFirstCorner < maxCornerDistance * forwardSpeed)
+        //     {
+        //         Debug.Log("Corner Changed to" + agent.path.corners[2] + " from " + agent.path.corners[1]);
+        //         targetPos = agent.path.corners[2];
+        //     }
+        //     else
+        //     {
+        //         targetPos = agent.path.corners[1];
+        //     }
+        // }
+        // else
+        // {
+        //     targetPos = agent.path.corners[1];
+        // }
+
         if(agent.path.corners.Length > 2)
         {
-            float distanceToFirstCorner = Vector3.Distance(transform.position, agent.path.corners[1]);
-            Debug.Log(distanceToFirstCorner);
-            if(distanceToFirstCorner < maxCornerDistance)
+            for(int i = 0; i < agent.path.corners.Length - 1; i++)
             {
-                targetPos = agent.path.corners[2];
+                float distanceToCorner = Vector3.Distance(transform.position, agent.path.corners[i]);
+                if(distanceToCorner < maxCornerDistance * forwardSpeed)
+                {
+                    targetPos = agent.path.corners[i + 1];
+                }
             }
-            else
+
+            float totalCorners = 0;
+            for(int i = 1; i < 3; i++)
             {
-                targetPos = agent.path.corners[1];
+                float angleToNextCorner = Vector3.SignedAngle(transform.forward, agent.path.corners[i] - agent.path.corners[i - 1], Vector3.up);
+                totalCorners += angleToNextCorner;
+                if(totalCorners / 3 > 50)
+                {
+                    break;
+                }
+                else
+                {
+                    currentBrakeTorque = brakeTorque / 2;
+                }
             }
         }
         else
