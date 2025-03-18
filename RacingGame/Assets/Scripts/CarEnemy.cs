@@ -1,7 +1,23 @@
+using System;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CarEnemy : MonoBehaviour
 {
+    public float motorTorque = 2000;
+    public float brakeTorque = 2000;
+    public float maxSpeed = 20;
+    public float centreOfGravityOffset = -1f;
+    public float currentMotorTorque;
+    public float decelerationMultiplier;
+    public float currentBrakeTorque;
+    public float forwardSpeed;
+
+
+    [SerializeField] private float brakeMultiplier;
+
+    private WheelControl[] wheels;
+    private Rigidbody rigidBody;
     [Header("References")]
     private GameObject player;
     private CarControl carControl;
@@ -10,146 +26,144 @@ public class CarEnemy : MonoBehaviour
     private float hInput;
     private float vInput;
 
-    [Header("Rubber Banding")]
-    [SerializeField] private float teleportOffset;
-    [SerializeField] private float playerDistanceOffset;
-    public Terrain terrainCarIsIn;
-    public Terrain[] terrains;
-    private float distanceToPlayer;
-
     [Header("Obstacle Avoidance")]
-    [SerializeField] private Vector3 coneOffset;
-    [SerializeField] private Transform centrePoint;
-    [SerializeField] private Transform centreRearPoint;
-    [SerializeField] private float coneAngle; 
-    [SerializeField] private float coneDistance; 
-    [SerializeField] private Vector2 coneConstraints;
-    private float time;
+    [SerializeField] private GameObject agentObject;
+    [SerializeField] private float maxCornerDistance;
+    private NavMeshAgent agent;
+    public Vector3 targetPos;
+    public float time;
 
     [Header("Damage")]
     public float damageMultiplier;
-
-    [Header("Steering")]
-    private float AngleToPlayer;
+    public bool reversing;
 
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        terrains = Terrain.activeTerrains;
         carControl = GetComponent<CarControl>();
-        vInput = 1;
+        agent = agentObject.GetComponent<NavMeshAgent>();
+
+        rigidBody = GetComponent<Rigidbody>();
+        rigidBody.centerOfMass += Vector3.up * centreOfGravityOffset;
+        wheels = GetComponentsInChildren<WheelControl>();
+        // agent.isStopped = true;
+        currentBrakeTorque = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        RubberBanding();
-        ConeOfVisionAvoidance();
-        carControl.hInput = hInput;
-        carControl.vInput = vInput;
-    }
-
-    void RubberBanding()
-    {
-        distanceToPlayer = Vector3.Distance(new Vector3(player.transform.position.x, 0, player.transform.position.z), new Vector3(transform.position.x, 0, transform.position.z));
-
-        if(distanceToPlayer > playerDistanceOffset)
+        if(agent.nextPosition.x != transform.position.x || agent.nextPosition.z != transform.position.z)
         {
-            TeleportToPlayer();
+            agentObject.transform.position = transform.position;
         }
+
+        forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
+        // if(Mathf.Abs(forwardSpeed) < 0.5f || reversing)
+        // {
+        //     time += Time.deltaTime;
+        //     if(time > 1)
+        //     {
+        //         reversing = true;
+        //         currentMotorTorque = -motorTorque;
+        //         currentBrakeTorque = 0;
+        //         hInput = -hInput;
+        //         if(time > 3)
+        //         {
+        //             reversing = false;
+        //             time = 0;
+        //             currentMotorTorque = motorTorque;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         if(Mathf.Abs(hInput) > 5)
+        //         {
+        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
+        //         }
+        //         else if(Mathf.Abs(hInput) > 30)
+        //         {
+        //             currentMotorTorque = motorTorque / 2;
+        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
+        //         }
+        //         else if(Mathf.Abs(hInput) > 40)
+        //         {
+        //             currentMotorTorque = motorTorque / 5;
+        //             currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+        //         }
+        //         else
+        //         {
+        //             currentMotorTorque = motorTorque;
+        //             currentBrakeTorque = 0;
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     time = 0;
+        //     if(Mathf.Abs(hInput) > 5)
+        //     {
+        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
+        //     }
+        //     else if(Mathf.Abs(hInput) > 30)
+        //     {
+        //         currentMotorTorque = motorTorque / 2;
+        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
+        //     }
+        //     else if(Mathf.Abs(hInput) > 40)
+        //     {
+        //         currentMotorTorque = motorTorque / 5;
+        //         currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+        //     }
+        //     else
+        //     {
+        //         currentMotorTorque = motorTorque;
+        //     }
+        // }
+        DriveCar();
     }
 
-    void SteerInDirectionOfPlayer()
+    void FixedUpdate()
     {
-        AngleToPlayer = Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(player.transform.position - transform.position).eulerAngles.y) / 10;
-
-        hInput = Mathf.Clamp(AngleToPlayer, -1, 1);
-    }
-
-    void TeleportToPlayer()
-    {
-        for(int i = 0; i < terrains.Length; i++)
+        agent.SetDestination(player.transform.position);
+        if(agent.path.corners.Length > 2)
         {
-            Debug.Log(i);
-            if(transform.position.x >= terrains[i].transform.position.x && transform.position.x <= terrains[i].transform.position.x + terrains[i].terrainData.size.x && transform.position.z >= terrains[i].transform.position.z && transform.position.z <= terrains[i].transform.position.z + terrains[i].terrainData.size.z)
+            float distanceToFirstCorner = Vector3.Distance(transform.position, agent.path.corners[1]);
+            Debug.Log(distanceToFirstCorner);
+            if(distanceToFirstCorner < maxCornerDistance)
             {
-                terrainCarIsIn = terrains[i];
-                break;
+                targetPos = agent.path.corners[2];
             }
-        }
-
-        transform.position = new Vector3(player.transform.position.x - player.transform.forward.x * teleportOffset, terrainCarIsIn.SampleHeight(transform.position) + terrainCarIsIn.transform.position.y + 2, player.transform.position.z - player.transform.forward.z * teleportOffset);
-    }
-
-    void ConeOfVisionAvoidance()
-    {
-
-        float dynamicConeDistance = coneDistance * carControl.forwardSpeed;
-        dynamicConeDistance = Mathf.Clamp(dynamicConeDistance, coneConstraints.x, coneConstraints.y);
-
-        Vector3 boxCenter = centrePoint.position + centrePoint.forward * (dynamicConeDistance / 2) + coneOffset;
-        Collider[] hitColliders = Physics.OverlapBox(boxCenter, new Vector3(dynamicConeDistance / 2, 1, dynamicConeDistance / 2), centrePoint.rotation, ~LayerMask.GetMask("IgnoreObstacleAvoidance"));
-
-        if(hitColliders.Length != 0)
-        {
-            Transform target = hitColliders[0].transform;
-            Debug.Log(target);
-            Debug.DrawLine(target.transform.position, target.transform.position + new Vector3 (1, 1, 1));
-            float angleToObstacle = Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(target.transform.position - centreRearPoint.position).eulerAngles.y);
-
-            if (Mathf.Abs(angleToObstacle) < coneAngle / 2)
+            else
             {
-                if(angleToObstacle > 0)
-                {
-                    angleToObstacle = (coneAngle / 2) - angleToObstacle;
-                }
-                else
-                {
-                    angleToObstacle = -(coneAngle / 2) - angleToObstacle;
-                }
-
-                Debug.Log(angleToObstacle);
-                hInput = Mathf.Clamp(-angleToObstacle, -1, 1);
-
-                if(carControl.forwardSpeed < 0.5f)
-                {
-                    vInput = -1;
-                    hInput = -hInput;
-                }
-                else
-                {
-                    vInput = 1;
-                }
-            }
-        }
-        else
-        {
-            vInput = 1;
-            SteerInDirectionOfPlayer();
-        }
-
-        if (carControl.forwardSpeed < 0.5f && carControl.forwardSpeed > -0.5f)
-        {
-            time += Time.deltaTime;
-            if(time > 1)
-            {
-                vInput = -1;
-                hInput = -hInput;
-                time = 0;
-                Invoke("StopReversing", 1f);
+                targetPos = agent.path.corners[1];
             }
         }
         else
         {
-            time = 0;
+            targetPos = agent.path.corners[1];
         }
 
+        hInput = Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y);
     }
 
-    void StopReversing()
+    void DriveCar()
     {
-        vInput = 1;
+        foreach (var wheel in wheels)
+        {
+            if (wheel.steerable)
+            {
+                wheel.WheelCollider.steerAngle = Mathf.Clamp(hInput, -45, 45);
+            }
+        
+            if (wheel.motorized)
+            {
+                wheel.WheelCollider.motorTorque = currentMotorTorque;
+            }
+
+            wheel.WheelCollider.brakeTorque = currentBrakeTorque;
+        }
     }
 }
