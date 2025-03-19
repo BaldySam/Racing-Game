@@ -6,6 +6,8 @@ TagManager:
   tags:
   - IgnoreObstacleAvoidance
   - Enemy
+  - EnemyRacer
+  - CheckpointHolder
   layers:
   - Default
   - TransparentFX

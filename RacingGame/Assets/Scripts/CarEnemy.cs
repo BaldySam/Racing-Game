@@ -4,6 +4,7 @@ using UnityEngine.AI;
 
 public class CarEnemy : MonoBehaviour
 {
+    [Header("Car Settings")]
     public float motorTorque = 2000;
     public float brakeTorque = 2000;
     public float maxSpeed = 20;
@@ -12,12 +13,10 @@ public class CarEnemy : MonoBehaviour
     public float decelerationMultiplier;
     public float currentBrakeTorque;
     public float forwardSpeed;
-
-
     [SerializeField] private float brakeMultiplier;
-
     private WheelControl[] wheels;
     private Rigidbody rigidBody;
+
     [Header("References")]
     private GameObject player;
 
@@ -36,6 +35,14 @@ public class CarEnemy : MonoBehaviour
     public float damageMultiplier;
     public bool reversing;
 
+    [Header("Enemy Type")]
+    [SerializeField] private bool isPolice;
+
+    [Header("Checkpoint")]
+    [SerializeField] private GameObject checkpointHolder;
+    public int checkpointIndex;
+    public GameObject[] checkpoints;
+
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +54,13 @@ public class CarEnemy : MonoBehaviour
         rigidBody.centerOfMass += Vector3.up * centreOfGravityOffset;
         wheels = GetComponentsInChildren<WheelControl>();
         // agent.isStopped = true;
+        currentMotorTorque = motorTorque;
         currentBrakeTorque = 0;
+        checkpoints = new GameObject[checkpointHolder.transform.childCount];
+        for(int i = 0; i < checkpointHolder.transform.childCount; i++)
+        {
+            checkpoints[i] = checkpointHolder.transform.GetChild(i).gameObject;
+        }
     }
 
     // Update is called once per frame
@@ -59,16 +72,16 @@ public class CarEnemy : MonoBehaviour
         }
 
         forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
+
         if(Mathf.Abs(forwardSpeed) < 0.1f || reversing)
         {
             time += Time.deltaTime;
-            if(time > 1)
+            if(time > .5f)
             {
                 reversing = true;
                 currentMotorTorque = -motorTorque;
                 currentBrakeTorque = 0;
-                hInput = -hInput;
-                if(time > 3)
+                if(time > 2)
                 {
                     reversing = false;
                     time = 0;
@@ -77,24 +90,32 @@ public class CarEnemy : MonoBehaviour
             }
             else
             {
-                if(Mathf.Abs(hInput) > 5)
+                if(forwardSpeed > 10 || forwardSpeed < -10)
                 {
-                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
-                }
-                else if(Mathf.Abs(hInput) > 30)
-                {
-                    currentMotorTorque = motorTorque / 2;
-                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
-                }
-                else if(Mathf.Abs(hInput) > 40)
-                {
-                    currentMotorTorque = motorTorque / 5;
-                    currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+                    if(Mathf.Abs(hInput) > 5)
+                    {
+                        currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * Mathf.Abs(forwardSpeed);
+                    }
+                    else if(Mathf.Abs(hInput) > 30)
+                    {
+                        currentMotorTorque = motorTorque / 2;
+                        currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 2 * Mathf.Abs(forwardSpeed);
+                    }
+                    else if(Mathf.Abs(hInput) > 40)
+                    {
+                        currentMotorTorque = motorTorque / 5;
+                        currentBrakeTorque = Mathf.Abs(hInput) * brakeMultiplier * 4 * Mathf.Abs(forwardSpeed);
+                    }
+                    else
+                    {
+                        currentMotorTorque = motorTorque;
+                        currentBrakeTorque = 0;
+                    }
                 }
                 else
                 {
-                    currentMotorTorque = motorTorque;
                     currentBrakeTorque = 0;
+                    currentMotorTorque = motorTorque;
                 }
             }
         }
@@ -135,25 +156,10 @@ public class CarEnemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        agent.SetDestination(player.transform.position);
-        // if(agent.path.corners.Length > 2)
-        // {
-        //     Debug.Log(agent.path.corners.Length);
-        //     float distanceToFirstCorner = Vector3.Distance(transform.position, agent.path.corners[1]);
-        //     if(distanceToFirstCorner < maxCornerDistance * forwardSpeed)
-        //     {
-        //         Debug.Log("Corner Changed to" + agent.path.corners[2] + " from " + agent.path.corners[1]);
-        //         targetPos = agent.path.corners[2];
-        //     }
-        //     else
-        //     {
-        //         targetPos = agent.path.corners[1];
-        //     }
-        // }
-        // else
-        // {
-        //     targetPos = agent.path.corners[1];
-        // }
+        if(isPolice)
+            agent.SetDestination(player.transform.position);
+        else
+            agent.SetDestination(checkpoints[checkpointIndex].transform.position);
 
         if(agent.path.corners.Length > 2)
         {
@@ -165,28 +171,13 @@ public class CarEnemy : MonoBehaviour
                     targetPos = agent.path.corners[i + 1];
                 }
             }
-
-            float totalCorners = 0;
-            for(int i = 1; i < 3; i++)
-            {
-                float angleToNextCorner = Vector3.SignedAngle(transform.forward, agent.path.corners[i] - agent.path.corners[i - 1], Vector3.up);
-                totalCorners += angleToNextCorner;
-                if(totalCorners / 3 > 50)
-                {
-                    break;
-                }
-                else
-                {
-                    currentBrakeTorque = brakeTorque / 2;
-                }
-            }
         }
         else
         {
             targetPos = agent.path.corners[1];
         }
 
-        hInput = Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y);
+        hInput = !reversing ? Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y) : -Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y);
     }
 
     void DriveCar()
