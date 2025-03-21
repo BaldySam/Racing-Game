@@ -56,6 +56,7 @@ public class CarEnemy : MonoBehaviour
         // agent.isStopped = true;
         currentMotorTorque = motorTorque;
         currentBrakeTorque = 0;
+        checkpointHolder = GameObject.FindGameObjectWithTag("CheckpointHolder");
         checkpoints = new GameObject[checkpointHolder.transform.childCount];
         for(int i = 0; i < checkpointHolder.transform.childCount; i++)
         {
@@ -177,7 +178,9 @@ public class CarEnemy : MonoBehaviour
             targetPos = agent.path.corners[1];
         }
 
-        hInput = !reversing ? Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y) : -Mathf.DeltaAngle(transform.localRotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y);
+        Debug.DrawLine(transform.position, targetPos, Color.red);
+
+        hInput = !reversing ? Mathf.DeltaAngle(transform.rotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y) : -Mathf.DeltaAngle(transform.rotation.eulerAngles.y, Quaternion.LookRotation(targetPos - transform.position).eulerAngles.y);
     }
 
     void DriveCar()
