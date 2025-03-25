@@ -56,14 +56,28 @@ namespace Unity.Splines.Examples
         Mesh m_Mesh;
 
         [SerializeField]
-        float m_TextureScale = 1f;
+        float m_RoadTextureScale = 1f;
+
+        [SerializeField]
+        Material m_RoadMaterial;
+
+        [SerializeField]
+        Vector2 m_RoadTextureCoords = new Vector2(0f, 0.5f);
+
+        [SerializeField]
+        Vector2 m_PavementTextureCoords = new Vector2(0.5f, 1f);
+
+        [SerializeField]
+        Vector2 m_PavementTextureScaleTop;
+
+        [SerializeField]
+        Vector2 m_PavementTextureScaleSide;
 
         [SerializeField]
         bool pavement = true;
 
         [SerializeField]
         Vector2 pavementSize = new Vector2(1f, 1f);
-
         public IReadOnlyList<Spline> splines => LoftSplines;
 
         public IReadOnlyList<Spline> LoftSplines
@@ -93,7 +107,7 @@ namespace Unity.Splines.Examples
                     return m_Mesh;
 
                 m_Mesh = new Mesh();
-                GetComponent<MeshRenderer>().sharedMaterial = Resources.Load<Material>("Road");
+                GetComponent<MeshRenderer>().sharedMaterial = m_RoadMaterial;
                 return m_Mesh;
             }
         }
@@ -273,14 +287,14 @@ namespace Unity.Splines.Examples
 
             if (length <= 0.001f)
                 return;
-
+            
             var segmentsPerLength = SegmentsPerMeter * length;
             var segments = Mathf.CeilToInt(segmentsPerLength);
             var segmentStepT = (1f / SegmentsPerMeter) / length;
             var steps = segments + 1;
             var prevVertexCount = m_Positions.Count;
-            var vertexCount = steps * 2;
-            var triangleCount = segments * 6;
+            var vertexCount = pavement ? steps * 8 : steps * 2;
+            var triangleCount = pavement ? segments * 1 : segments * 6;
 
             m_Positions.Capacity += vertexCount;
             m_Normals.Capacity += vertexCount;
@@ -326,41 +340,14 @@ namespace Unity.Splines.Examples
 
                 if(pavement)
                 {
-                    SplineUtility.Evaluate(spline, t, out var nextPosition, out var nextDir, out var nextUp);
-
-                    // If dir evaluates to zero (linear or broken zero length tangents?)
-                    // then attempt to advance forward by a small amount and build direction to that point
-                    if (math.length(nextDir) == 0)
-                    {
-                        var nextPos = spline.GetPointAtLinearDistance(t, 0.01f, out _);
-                        nextDir = math.normalizesafe(nextPos - pos);
-
-                        if (math.length(nextDir) == 0)
-                        {
-                            nextPos = spline.GetPointAtLinearDistance(t, -0.01f, out _);
-                            nextDir = -math.normalizesafe(nextPos - pos);
-                        }
-
-                        if (math.length(nextDir) == 0)
-                            nextDir = new float3(0, 0, 1);
-                    }
-
-                    var nextTangent = math.normalizesafe(math.cross(nextUp, nextDir)) * new float3(1f / scale.x, 1f / scale.y, 1f / scale.z);
-
-                    var nextW = 1f;
-                    if (widthDataIndex < m_Widths.Count)
-                    {
-                        nextW = m_Widths[widthDataIndex].DefaultValue;
-                        if (m_Widths[widthDataIndex] != null && m_Widths[widthDataIndex].Count > 0)
-                        {
-                            nextW = m_Widths[widthDataIndex].Evaluate(spline, t, PathIndexUnit.Normalized, new Interpolators.LerpFloat());
-                            nextW = math.clamp(nextW, .001f, 10000f);
-                        }
-                    }
-
-                    m_Positions.Add(pos - (tangent * w));                            // 0   3
-                    m_Positions.Add(pos + (tangent * w));                            // 1   4
-                    m_Positions.Add(pos - (tangent * w) + (up * pavementSize.y));    // 2
+                    m_Positions.Add(pos - (tangent * w));                                                     // Left Road                      n + 0
+                    m_Positions.Add(pos + (tangent * w));                                                     // Right Road                     n + 1
+                    m_Positions.Add(pos - (tangent * w) + (up * pavementSize.y));                             // Left Pavement (Top Right)      n + 2    
+                    m_Positions.Add(pos + (tangent * w) + (up * pavementSize.y));                             // Right Pavement (Top Left)      n + 3
+                    m_Positions.Add(pos - (tangent * (w + pavementSize.x)));                                  // Left Pavement (Bottom Left)    n + 4
+                    m_Positions.Add(pos + (tangent * (w + pavementSize.x)));                                  // Right Pavement (Bottom Right)  n + 5
+                    m_Positions.Add(pos - (tangent * (w + pavementSize.x)) + (up * pavementSize.y));          // Left Pavement (Top Left)       n + 6
+                    m_Positions.Add(pos + (tangent * (w + pavementSize.x)) + (up * pavementSize.y));          // Right Pavement (Top Right)     n + 7
                 }
                 else
                 {
@@ -374,39 +361,125 @@ namespace Unity.Splines.Examples
                 {
                     m_Normals.Add(up);
                     m_Normals.Add(up);
+                    m_Normals.Add(up);
+                    m_Normals.Add(up);
+                    m_Normals.Add(up);
+                    m_Normals.Add(up);                   
                 }
 
-                m_Textures.Add(new Vector2(0f, t * m_TextureScale));
-                m_Textures.Add(new Vector2(1f, t * m_TextureScale));
+                m_Textures.Add(new Vector2(m_RoadTextureCoords.x, t * m_RoadTextureScale));
+                m_Textures.Add(new Vector2(m_RoadTextureCoords.y, t * m_RoadTextureScale));
                 if(pavement)
                 {
-                    m_Textures.Add(new Vector2(0f, t * m_TextureScale));
-                    m_Textures.Add(new Vector2(1f, t * m_TextureScale));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.x, t * m_PavementTextureScaleTop.y));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.y, t * m_PavementTextureScaleTop.y));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.x, t * m_PavementTextureScaleSide.y));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.y, t * m_PavementTextureScaleSide.y));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.x, t * m_PavementTextureScaleTop.y));
+                    m_Textures.Add(new Vector2(m_PavementTextureCoords.y, t * m_PavementTextureScaleTop.y));
                 }
-
 
                 t = math.min(1f, t + segmentStepT);
             }
 
-            for (int i = 0, n = prevVertexCount; i < triangleCount; i += 6, n += 2)
+            if(pavement)
             {
-                Debug.Log(n);
-                // Top Face
-                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                for (int i = 0, n = prevVertexCount; i < triangleCount; i += 1, n += 8)
+                {    
+                    // Left Pavement
 
-                // Bottom Face
-                m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
-                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    // Left Face
+                    m_Indices.Add((n + 6) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 4) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 12) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 6) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 12) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 14) % (prevVertexCount + vertexCount));
+
+                    // Top Face
+                    m_Indices.Add((n + 6) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 14) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 10) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 6) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 10) % (prevVertexCount + vertexCount));
+
+                    //Right Face
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 10) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+
+                    // Road Top
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 9) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+
+                    // Road Bottom
+                    m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 9) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 8) % (prevVertexCount + vertexCount));
+                    
+                    // Right Pavement
+
+                    // Left Face
+                    m_Indices.Add((n + 9) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 11) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 11) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+
+                    // Top Face
+                    m_Indices.Add((n + 11) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 15) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 7) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 7) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 11) % (prevVertexCount + vertexCount));
+
+                    // Right Face
+                    m_Indices.Add((n + 7) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 15) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 13) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 13) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 5) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 7) % (prevVertexCount + vertexCount));
+
+
+                }
             }
+            else
+            {
+                for (int i = 0, n = prevVertexCount; i < triangleCount; i += 6, n += 2)
+                {
+                    Debug.Log(n);
+                    // Top Face
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+
+                    // Bottom Face
+                    m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
+                    m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                }
+            }
+
         }
 
     }
