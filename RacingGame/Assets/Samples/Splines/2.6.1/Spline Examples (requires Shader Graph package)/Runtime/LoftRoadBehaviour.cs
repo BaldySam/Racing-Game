@@ -58,6 +58,12 @@ namespace Unity.Splines.Examples
         [SerializeField]
         float m_TextureScale = 1f;
 
+        [SerializeField]
+        bool pavement = true;
+
+        [SerializeField]
+        Vector2 pavementSize = new Vector2(1f, 1f);
+
         public IReadOnlyList<Spline> splines => LoftSplines;
 
         public IReadOnlyList<Spline> LoftSplines
@@ -272,14 +278,15 @@ namespace Unity.Splines.Examples
             var segments = Mathf.CeilToInt(segmentsPerLength);
             var segmentStepT = (1f / SegmentsPerMeter) / length;
             var steps = segments + 1;
+            var prevVertexCount = m_Positions.Count;
             var vertexCount = steps * 2;
             var triangleCount = segments * 6;
-            var prevVertexCount = m_Positions.Count;
 
             m_Positions.Capacity += vertexCount;
             m_Normals.Capacity += vertexCount;
             m_Textures.Capacity += vertexCount;
             m_Indices.Capacity += triangleCount;
+
 
             var t = 0f;
             for (int i = 0; i < steps; i++)
@@ -317,25 +324,90 @@ namespace Unity.Splines.Examples
                     }
                 }
 
-                m_Positions.Add(pos - (tangent * w));
-                m_Positions.Add(pos + (tangent * w));
+                if(pavement)
+                {
+                    SplineUtility.Evaluate(spline, t, out var nextPosition, out var nextDir, out var nextUp);
+
+                    // If dir evaluates to zero (linear or broken zero length tangents?)
+                    // then attempt to advance forward by a small amount and build direction to that point
+                    if (math.length(nextDir) == 0)
+                    {
+                        var nextPos = spline.GetPointAtLinearDistance(t, 0.01f, out _);
+                        nextDir = math.normalizesafe(nextPos - pos);
+
+                        if (math.length(nextDir) == 0)
+                        {
+                            nextPos = spline.GetPointAtLinearDistance(t, -0.01f, out _);
+                            nextDir = -math.normalizesafe(nextPos - pos);
+                        }
+
+                        if (math.length(nextDir) == 0)
+                            nextDir = new float3(0, 0, 1);
+                    }
+
+                    var nextTangent = math.normalizesafe(math.cross(nextUp, nextDir)) * new float3(1f / scale.x, 1f / scale.y, 1f / scale.z);
+
+                    var nextW = 1f;
+                    if (widthDataIndex < m_Widths.Count)
+                    {
+                        nextW = m_Widths[widthDataIndex].DefaultValue;
+                        if (m_Widths[widthDataIndex] != null && m_Widths[widthDataIndex].Count > 0)
+                        {
+                            nextW = m_Widths[widthDataIndex].Evaluate(spline, t, PathIndexUnit.Normalized, new Interpolators.LerpFloat());
+                            nextW = math.clamp(nextW, .001f, 10000f);
+                        }
+                    }
+
+                    m_Positions.Add(pos - (tangent * w));                            // 0   3
+                    m_Positions.Add(pos + (tangent * w));                            // 1   4
+                    m_Positions.Add(pos - (tangent * w) + (up * pavementSize.y));    // 2
+                }
+                else
+                {
+                    m_Positions.Add(pos - (tangent * w));
+                    m_Positions.Add(pos + (tangent * w));
+                }
+
                 m_Normals.Add(up);
                 m_Normals.Add(up);
+                if(pavement)
+                {
+                    m_Normals.Add(up);
+                    m_Normals.Add(up);
+                }
+
                 m_Textures.Add(new Vector2(0f, t * m_TextureScale));
                 m_Textures.Add(new Vector2(1f, t * m_TextureScale));
+                if(pavement)
+                {
+                    m_Textures.Add(new Vector2(0f, t * m_TextureScale));
+                    m_Textures.Add(new Vector2(1f, t * m_TextureScale));
+                }
+
 
                 t = math.min(1f, t + segmentStepT);
             }
 
             for (int i = 0, n = prevVertexCount; i < triangleCount; i += 6, n += 2)
             {
+                Debug.Log(n);
+                // Top Face
                 m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
                 m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
                 m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
                 m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
                 m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
                 m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+
+                // Bottom Face
+                m_Indices.Add((n + 0) % (prevVertexCount + vertexCount));
+                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
+                m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));
+                m_Indices.Add((n + 3) % (prevVertexCount + vertexCount));
+                m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
             }
         }
+
     }
 }
