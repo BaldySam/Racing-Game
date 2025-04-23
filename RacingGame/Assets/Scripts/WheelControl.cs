@@ -62,4 +62,16 @@ public class WheelControl : MonoBehaviour
             }
         }
     }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("OffRoad"))
+        {
+            
+        }
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Road"))
+        {
+            
+        }
+    }
 }
