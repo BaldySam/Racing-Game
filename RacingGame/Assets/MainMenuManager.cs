@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class MainMenuManager : MonoBehaviour
 {
+    public Canvas MainMenu;
+    public Canvas TrackSelector;
+    public Canvas Garage;
+    public Canvas CarMarket;
+    public Canvas Options;
     // Start is called before the first frame update
     void Start()
     {
