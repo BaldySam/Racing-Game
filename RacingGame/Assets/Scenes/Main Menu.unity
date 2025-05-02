@@ -4486,6 +4486,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b81b83e920c11674aaa7eded94f887f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MainMenu: {fileID: 0}
+  TrackSelector: {fileID: 0}
+  Garage: {fileID: 0}
+  CarMarket: {fileID: 0}
+  Options: {fileID: 0}
 --- !u!4 &1964980532
 Transform:
   m_ObjectHideFlags: 0
