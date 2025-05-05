@@ -14,7 +14,7 @@ NavMeshProjectSettings:
   - name: Road
     cost: 1
   - name: Offroad
-    cost: 2
+    cost: 5
   - name: 
     cost: 1
   - name: 

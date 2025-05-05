@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TrackSeletorManager : MonoBehaviour
 {
@@ -18,16 +19,16 @@ public class TrackSeletorManager : MonoBehaviour
 
     public void OnTrackOne()
     {
-
+        SceneManager.LoadScene(1);
     }
 
     public void OnTrackTwo()
     {
-
+        SceneManager.LoadScene(2);
     }
 
     public void OnTrackThree()
     {
-
+        SceneManager.LoadScene(3);
     }
 }

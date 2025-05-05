@@ -43,6 +43,8 @@ public class CarEnemy : MonoBehaviour
     public int checkpointIndex;
     public GameObject[] checkpoints;
 
+    private float offroadTime;
+
 
     // Start is called before the first frame update
     void Start()
@@ -198,6 +200,23 @@ public class CarEnemy : MonoBehaviour
             }
 
             wheel.WheelCollider.brakeTorque = currentBrakeTorque;
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag != "Road")
+        {
+            offroadTime += Time.deltaTime;
+            if (offroadTime > 2)
+            {
+                transform.position = checkpoints[checkpointIndex - 1].transform.position;
+                offroadTime = 0;
+            }
+        }
+        else
+        {
+            offroadTime = 0;
         }
     }
 }

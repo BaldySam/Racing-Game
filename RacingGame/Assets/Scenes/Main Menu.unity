@@ -191,7 +191,7 @@ RectTransform:
   m_Father: {fileID: 1613318298}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -634,7 +634,7 @@ RectTransform:
   m_Father: {fileID: 395883268}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -930,7 +930,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 508222472}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980531}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OnGarage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &508222472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1126,7 +1138,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 578703213}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980531}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OnOptions
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &578703213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1198,7 +1222,7 @@ RectTransform:
   m_Father: {fileID: 140671531}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 59.6, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1322,7 +1346,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 630455134}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980531}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OnQuit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &630455134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1603,7 +1639,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &685151038
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1939,7 +1975,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 901605740}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980530}
+        m_TargetAssemblyTypeName: TrackSeletorManager, Assembly-CSharp
+        m_MethodName: OnTrackTwo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &901605740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2251,7 +2299,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1013763017
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2459,7 +2507,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1060384638}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980531}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OnTrackSelector
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1060384638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2871,7 +2931,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1173217226}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980531}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OnCarMarket
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1173217226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3062,7 +3134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1202288114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3184,7 +3256,7 @@ RectTransform:
   m_Father: {fileID: 236210444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3453,7 +3525,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1318898024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3706,7 +3778,7 @@ RectTransform:
   m_Father: {fileID: 1025054271}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 59.6, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3866,7 +3938,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1789264682}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980530}
+        m_TargetAssemblyTypeName: TrackSeletorManager, Assembly-CSharp
+        m_MethodName: OnTrackThree
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1789264682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3987,7 +4071,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1811890880}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1964980530}
+        m_TargetAssemblyTypeName: TrackSeletorManager, Assembly-CSharp
+        m_MethodName: OnTrackOne
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1811890880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4193,7 +4289,7 @@ RectTransform:
   m_Father: {fileID: 1068773696}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 59.6, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4486,11 +4582,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b81b83e920c11674aaa7eded94f887f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainMenu: {fileID: 0}
-  TrackSelector: {fileID: 0}
-  Garage: {fileID: 0}
-  CarMarket: {fileID: 0}
-  Options: {fileID: 0}
+  MainMenu: {fileID: 1202288116}
+  TrackSelector: {fileID: 1318898026}
+  Garage: {fileID: 685151041}
+  CarMarket: {fileID: 2115998341}
+  Options: {fileID: 1013763020}
 --- !u!4 &1964980532
 Transform:
   m_ObjectHideFlags: 0
@@ -4802,7 +4898,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2115998338
 RectTransform:
   m_ObjectHideFlags: 0
