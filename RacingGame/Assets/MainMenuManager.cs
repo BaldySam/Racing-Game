@@ -12,11 +12,7 @@ public class MainMenuManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MainMenu.enabled = true;
-        TrackSelector.enabled = false;
-        Garage.enabled = false;
-        CarMarket.enabled = false;
-        Options.enabled = false;
+        OnMainMenu();
     }
 
     // Update is called once per frame
@@ -64,5 +60,14 @@ public class MainMenuManager : MonoBehaviour
     public void OnQuit()
     {
         Application.Quit();
+    }
+
+    public void OnMainMenu()
+    {
+        MainMenu.enabled = true;
+        TrackSelector.enabled = false;
+        Garage.enabled = false;
+        CarMarket.enabled = false;
+        Options.enabled = false;
     }
 }

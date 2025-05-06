@@ -22941,6 +22941,7 @@ GameObject:
   - component: {fileID: 3715003409664684228}
   - component: {fileID: 3561687998405597628}
   - component: {fileID: 7551659641718346786}
+  - component: {fileID: 2340427884491279624}
   m_Layer: 0
   m_Name: Enemy Car (2)
   m_TagString: EnemyRacer
@@ -23028,3 +23029,24 @@ MonoBehaviour:
   checkpointHolder: {fileID: 0}
   checkpointIndex: 0
   checkpoints: []
+--- !u!65 &2340427884491279624
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8977966197270003426}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.68, y: 3.36, z: 4.9}
+  m_Center: {x: -0.000001907349, y: 0, z: 0.00003051758}
