@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BrakingZone : MonoBehaviour
 {
-    float brakingForcePercent;
+    [SerializeField] float brakingForcePercent;
+    bool inBrakingZone;
+    Collider aiRacer;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,15 +16,30 @@ public class BrakingZone : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(inBrakingZone)
+        {
+            aiRacer.GetComponent<CarEnemy>().brakeTorque = aiRacer.GetComponent<CarEnemy>().brakeTorque  * brakingForcePercent;
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("EnemyRacer"))
         {
-            other.GetComponent<CarEnemy>().brakeTorque = other.GetComponent<CarEnemy>().brakeTorque  * brakingForcePercent;
+            inBrakingZone = true;
+            aiRacer = other;
         }
+        else
+        {
+            inBrakingZone = false;
+        }
+    }
 
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("EnemyRacer"))
+        {
+            inBrakingZone = false;
+        }
     }
 }

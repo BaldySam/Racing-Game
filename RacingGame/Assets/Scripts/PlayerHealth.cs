@@ -32,7 +32,8 @@ public class PlayerHealth : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Enemy" || collision.gameObject.tag == "EnemyRacer")
+        Debug.Log(collision.gameObject.tag);
+        if(collision.gameObject.tag == "FrontHitbox")
         {
             enemySpeedOnCollision = collision.gameObject.GetComponent<CarEnemy>().forwardSpeed;
             playerCurrentHealth += Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * collision.gameObject.GetComponent<CarEnemy>().damageMultiplier);

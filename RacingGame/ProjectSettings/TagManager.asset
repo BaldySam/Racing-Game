@@ -9,6 +9,8 @@ TagManager:
   - EnemyRacer
   - CheckpointHolder
   - OutOfBounds
+  - Ignore
+  - FrontHitbox
   layers:
   - Default
   - TransparentFX

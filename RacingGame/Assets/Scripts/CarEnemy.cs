@@ -200,15 +200,17 @@ public class CarEnemy : MonoBehaviour
             }
 
             wheel.WheelCollider.brakeTorque = currentBrakeTorque;
+
         }
     }
 
-    void OnTriggerEnter(Collider collision)
+    void OnTriggerStay(Collider collision)
     {
-        if (collision.gameObject.tag != "Road")
+        if (collision.gameObject.tag != "Road" && collision.gameObject.tag != "EnemyRacer" && collision.gameObject.tag != "CheckpointHolder" && collision.gameObject.tag != "Ignore")
         {
+            Debug.Log(collision.gameObject.tag + " " + collision.gameObject.name);
             offroadTime += Time.deltaTime;
-            if (offroadTime > 2)
+            if (offroadTime > 5)
             {
                 transform.position = checkpoints[checkpointIndex - 1].transform.position;
                 offroadTime = 0;
