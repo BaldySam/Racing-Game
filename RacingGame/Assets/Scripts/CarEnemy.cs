@@ -213,6 +213,7 @@ public class CarEnemy : MonoBehaviour
             if (offroadTime > 5)
             {
                 transform.position = checkpoints[checkpointIndex - 1].transform.position;
+                transform.rotation = checkpoints[checkpointIndex - 1].transform.rotation;
                 offroadTime = 0;
             }
         }
