@@ -11,7 +11,6 @@ public class BrakingZone : MonoBehaviour
     {
         if (other.CompareTag("EnemyRacer"))
         {
-            Debug.Log(other);
             other.transform.parent.GetComponent<CarEnemy>().brakeTorque = other.transform.parent.GetComponent<CarEnemy>().brakeTorque  * brakingForcePercent; 
         }
     }

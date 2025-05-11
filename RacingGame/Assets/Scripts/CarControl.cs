@@ -1,7 +1,9 @@
 using UnityEngine;
+using TMPro;
 
 public class CarControl : MonoBehaviour
 {
+    [SerializeField] TMP_Text speedText;
     public float motorTorque = 2000;
     public float brakeTorque = 2000;
     public float maxSpeed = 20;
@@ -38,6 +40,7 @@ public class CarControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        speedText.text = "Speed: " + Mathf.Round(forwardSpeed * 3.6f) + " km/h";
         // Calculate current speed in relation to the forward direction of the car
         // (this returns a negative number when traveling backwards)
         forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);

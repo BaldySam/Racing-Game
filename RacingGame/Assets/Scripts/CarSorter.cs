@@ -5,13 +5,13 @@ using UnityEngine;
 public class CarSorter : MonoBehaviour
 {
     CarControl carControl;
-    float baseTorque = 500f;
-    float torqueMultiplier = 300f;
-    float baseBrakeTorque = 300f;
-    float brakeTorqueMultiplier = 300f;
-    float baseMaxSpeed = 60f;
+    float baseTorque = 300f;
+    float torqueMultiplier = 100f;
+    float baseBrakeTorque = 150f;
+    float brakeTorqueMultiplier = 50f;
+    float baseMaxSpeed = 40f;
     float maxSpeedMultiplier = 10f;
-    float baseGrip = 20f;
+    float baseGrip = 10f;
     float gripMultiplier = 3;
     private WheelCollider[] wheels;
     // Start is called before the first frame update

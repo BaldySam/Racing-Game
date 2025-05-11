@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    public static int Money = 10000;
+    public static float Money = 10000;
     public static int Car = -1;
     public static Vector2 Grip = new Vector2(0, 0);
     public static Vector2 Acceleration = new Vector2(0, 0);

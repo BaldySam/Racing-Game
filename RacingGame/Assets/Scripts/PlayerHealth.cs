@@ -4,19 +4,23 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private CustomSlider healthBar;
+    [SerializeField] private CustomSlider healthBarUI;
     [SerializeField] private Image healthBarFill;
+    [SerializeField] private Image healthBarFillUI;
     [SerializeField] private Gradient gradient;
     private float enemySpeedOnCollision;
     public float playerMaxHealth = 100;
     public float playerCurrentHealth;
     private CarControl carControl;
-    public bool hit;
-    Collider collisionToSet;
+    [SerializeField] private PlayerCheckpointSorter playerCheckpointSorter;
 
     // Start is called before the first frame update
     void Start()
     {
+        playerMaxHealth = PlayerStats.Health.x * 10;
+        playerCurrentHealth = playerMaxHealth;
         healthBar.maxValue = playerMaxHealth;
+        healthBarUI.maxValue = playerMaxHealth;
         carControl = transform.GetComponent<CarControl>();
     }
 
@@ -24,7 +28,14 @@ public class PlayerHealth : MonoBehaviour
     void Update()
     {
         healthBar.currentValue = playerCurrentHealth;
+        healthBarUI.currentValue = playerCurrentHealth;
         healthBarFill.color = ColorFromGradient(healthBar.currentValue / healthBar.maxValue);
+        healthBarFillUI.color = ColorFromGradient(healthBar.currentValue / healthBar.maxValue);
+        if(playerCurrentHealth <= 0)
+        {
+            playerCheckpointSorter.ResetPlayer();
+            playerCurrentHealth = playerMaxHealth;
+        }
     }
 
     Color ColorFromGradient (float value)  // float between 0-1

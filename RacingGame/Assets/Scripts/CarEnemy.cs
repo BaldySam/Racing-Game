@@ -44,17 +44,18 @@ public class CarEnemy : MonoBehaviour
     public int checkpointIndex;
     public GameObject[] checkpoints;
 
+    [SerializeField] private PlayerCheckpointSorter playerCheckpointSorter;
+
     private float offroadTime;
 
     public int currentCheckpoint;
-    int maxCheckpoints;
+    public int maxCheckpoints;
     public int currentLap;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        maxCheckpoints = GameObject.FindWithTag("PlayerCheckpointSorter").GetComponent<PlayerCheckpointSorter>().maxCheckpoints;
         player = GameObject.FindGameObjectWithTag("Player");
         agent = agentObject.GetComponent<NavMeshAgent>();
 
@@ -70,15 +71,20 @@ public class CarEnemy : MonoBehaviour
         {
             checkpoints[i] = checkpointHolder.transform.GetChild(i).gameObject;
         }
+        playerCheckpointSorter = GameObject.FindGameObjectWithTag("PlayerCheckpointSorter").GetComponent<PlayerCheckpointSorter>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(currentCheckpoint >= maxCheckpoints)
+        if(!isPolice)
         {
-            currentCheckpoint = 0;
-            currentLap ++;
+            maxCheckpoints = playerCheckpointSorter.maxCheckpoints;
+            if(currentCheckpoint >= maxCheckpoints)
+            {
+                currentCheckpoint = 0;
+                currentLap ++;
+            }
         }
 
         if(agent.nextPosition.x != transform.position.x || agent.nextPosition.z != transform.position.z)
@@ -216,6 +222,44 @@ public class CarEnemy : MonoBehaviour
         }
     }
 
+    public void ResetToLastCheckpoint()
+    {
+        if(isPolice)
+        {
+            float closestDistance = float.MaxValue;
+            int closestCheckpointIndex = 0;
+
+            for (int i = 0; i < playerCheckpointSorter.checkpoints.Length; i++)
+            {
+                float distance = Vector3.Distance(transform.position, playerCheckpointSorter.checkpoints[i].transform.position);
+                if (distance < closestDistance)
+                {
+                closestDistance = distance;
+                closestCheckpointIndex = i;
+                }
+            }
+
+            transform.position = playerCheckpointSorter.checkpoints[closestCheckpointIndex].transform.position;
+            transform.rotation = playerCheckpointSorter.checkpoints[closestCheckpointIndex].transform.rotation;
+        }
+        else
+        {
+            if(currentCheckpoint == 0)
+            {
+                transform.position = playerCheckpointSorter.checkpoints[maxCheckpoints - 1].transform.position;
+                transform.rotation = playerCheckpointSorter.checkpoints[maxCheckpoints - 1].transform.rotation;
+            }
+            else
+            {
+                transform.position = playerCheckpointSorter.checkpoints[currentCheckpoint - 1].transform.position;
+                transform.rotation = playerCheckpointSorter.checkpoints[currentCheckpoint - 1].transform.rotation;
+            }
+        }
+        currentMotorTorque = motorTorque;
+        currentBrakeTorque = 0;
+        offroadTime = 0;
+    }
+
     void OnTriggerStay(Collider collision)
     {
         if (collision.gameObject.tag != "Road" && collision.gameObject.tag != "EnemyRacer" && collision.gameObject.tag != "CheckpointHolder" && collision.gameObject.tag != "Ignore")
@@ -225,6 +269,8 @@ public class CarEnemy : MonoBehaviour
             {
                 transform.position = checkpoints[checkpointIndex - 1].transform.position;
                 transform.rotation = checkpoints[checkpointIndex - 1].transform.rotation;
+                currentMotorTorque = motorTorque;
+                currentBrakeTorque = 0;
                 offroadTime = 0;
             }
         }

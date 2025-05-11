@@ -22,8 +22,7 @@ public class PlayerCheckpoint : MonoBehaviour
             }
 
         }
-
-        if(other.CompareTag("EnemyRacer"))
+        else if(other.CompareTag("EnemyRacer"))
         {
             if(gameObject == playerCheckpointSorter.checkpoints[other.transform.parent.GetComponent<CarEnemy>().currentCheckpoint])
             {
