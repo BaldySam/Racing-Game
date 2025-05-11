@@ -11,6 +11,9 @@ TagManager:
   - OutOfBounds
   - Ignore
   - FrontHitbox
+  - PlayerCheckpointSorter
+  - IgnoreTrigger
+  - AIRacerTag
   layers:
   - Default
   - TransparentFX
@@ -20,7 +23,7 @@ TagManager:
   - UI
   - Road
   - OffRoad
-  - 
+  - IgnoreTrigger
   - 
   - 
   - 

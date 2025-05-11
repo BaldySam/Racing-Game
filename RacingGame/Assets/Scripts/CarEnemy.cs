@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 
 public class CarEnemy : MonoBehaviour
 {
@@ -45,10 +46,15 @@ public class CarEnemy : MonoBehaviour
 
     private float offroadTime;
 
+    public int currentCheckpoint;
+    int maxCheckpoints;
+    public int currentLap;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        maxCheckpoints = GameObject.FindWithTag("PlayerCheckpointSorter").GetComponent<PlayerCheckpointSorter>().maxCheckpoints;
         player = GameObject.FindGameObjectWithTag("Player");
         agent = agentObject.GetComponent<NavMeshAgent>();
 
@@ -69,6 +75,12 @@ public class CarEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(currentCheckpoint >= maxCheckpoints)
+        {
+            currentCheckpoint = 0;
+            currentLap ++;
+        }
+
         if(agent.nextPosition.x != transform.position.x || agent.nextPosition.z != transform.position.z)
         {
             agentObject.transform.position = transform.position;
@@ -208,7 +220,6 @@ public class CarEnemy : MonoBehaviour
     {
         if (collision.gameObject.tag != "Road" && collision.gameObject.tag != "EnemyRacer" && collision.gameObject.tag != "CheckpointHolder" && collision.gameObject.tag != "Ignore")
         {
-            Debug.Log(collision.gameObject.tag + " " + collision.gameObject.name);
             offroadTime += Time.deltaTime;
             if (offroadTime > 5)
             {

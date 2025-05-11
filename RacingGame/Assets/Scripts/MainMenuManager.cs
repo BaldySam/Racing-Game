@@ -23,11 +23,14 @@ public class MainMenuManager : MonoBehaviour
 
     public void OnTrackSelector()
     {
-        MainMenu.enabled = false;
-        TrackSelector.enabled = true;
-        Garage.enabled = false;
-        CarMarket.enabled = false;
-        Options.enabled = false;
+        if(PlayerStats.Car > -1)
+        {
+            MainMenu.enabled = false;
+            TrackSelector.enabled = true;
+            Garage.enabled = false;
+            CarMarket.enabled = false;
+            Options.enabled = false;
+        }
     }
 
     public void OnGarage()

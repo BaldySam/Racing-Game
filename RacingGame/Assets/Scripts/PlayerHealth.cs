@@ -10,6 +10,8 @@ public class PlayerHealth : MonoBehaviour
     public float playerMaxHealth = 100;
     public float playerCurrentHealth;
     private CarControl carControl;
+    public bool hit;
+    Collider collisionToSet;
 
     // Start is called before the first frame update
     void Start()
@@ -30,13 +32,14 @@ public class PlayerHealth : MonoBehaviour
         return gradient.Evaluate(value);
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider collision)
     {
-        Debug.Log(collision.gameObject.tag);
         if(collision.gameObject.tag == "FrontHitbox")
         {
-            enemySpeedOnCollision = collision.gameObject.GetComponent<CarEnemy>().forwardSpeed;
-            playerCurrentHealth += Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * collision.gameObject.GetComponent<CarEnemy>().damageMultiplier);
+            CarEnemy carEnemy = collision.transform.parent.GetComponent<CarEnemy>();
+            enemySpeedOnCollision = carEnemy.forwardSpeed;
+            playerCurrentHealth += Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * carEnemy.damageMultiplier);
+            Debug.Log(Mathf.Abs(carControl.forwardSpeed) - Mathf.Abs(enemySpeedOnCollision * carEnemy.damageMultiplier));
         }
     }
 }

@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 2683882331668705203}
   - component: {fileID: 7896698699823914732}
   - component: {fileID: 6354481799214676422}
+  - component: {fileID: 5792658605287347509}
   m_Layer: 0
   m_Name: Cube
   m_TagString: FrontHitbox
@@ -59,8 +60,8 @@ Transform:
   m_GameObject: {fileID: 420927223500920958}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.162, y: 0.486, z: 2.418}
-  m_LocalScale: {x: 0.9679584, y: 0.86742, z: 0.30983377}
+  m_LocalPosition: {x: 0.202, y: 0.486, z: 0.717}
+  m_LocalScale: {x: 2.2434497, y: 1.0821065, z: 3.347535}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3715003409664684228}
@@ -80,7 +81,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420927223500920958}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -130,12 +131,39 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.0000001, y: 1, z: 1.0000001}
   m_Center: {x: -0.000001907349, y: 0, z: 0.00003051758}
+--- !u!54 &5792658605287347509
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420927223500920958}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &433964577492448059
 GameObject:
   m_ObjectHideFlags: 0
@@ -23149,7 +23177,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
