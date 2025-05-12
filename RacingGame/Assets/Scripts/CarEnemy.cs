@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -234,8 +235,8 @@ public class CarEnemy : MonoBehaviour
                 float distance = Vector3.Distance(transform.position, playerCheckpointSorter.checkpoints[i].transform.position);
                 if (distance < closestDistance)
                 {
-                closestDistance = distance;
-                closestCheckpointIndex = i;
+                    closestDistance = distance;
+                    closestCheckpointIndex = i;
                 }
             }
 
@@ -264,14 +265,11 @@ public class CarEnemy : MonoBehaviour
     {
         if (collision.gameObject.tag != "Road" && collision.gameObject.tag != "EnemyRacer" && collision.gameObject.tag != "CheckpointHolder" && collision.gameObject.tag != "Ignore")
         {
+            Debug.Log(collision + collision.tag);
             offroadTime += Time.deltaTime;
             if (offroadTime > 5)
             {
-                transform.position = checkpoints[checkpointIndex - 1].transform.position;
-                transform.rotation = checkpoints[checkpointIndex - 1].transform.rotation;
-                currentMotorTorque = motorTorque;
-                currentBrakeTorque = 0;
-                offroadTime = 0;
+                ResetToLastCheckpoint();
             }
         }
         else
