@@ -75,7 +75,7 @@ public class PlayerCheckpointSorter : MonoBehaviour
             }
         } 
 
-        checkpointText.text = "Checkpoint: " + (currentCheckpoint + 1) + "/" + maxCheckpoints + "\nLap: " + currentLap + "/" + maxLaps + "\nPosition: " + currentPosition + "/" + (carEnemy.Length + 1);
+        checkpointText.text = "Checkpoint: " + (currentCheckpoint + 1) + "/" + maxCheckpoints + "\nLap: " + (currentLap + 1) + "/" + maxLaps + "\nPosition: " + currentPosition + "/" + (carEnemy.Length + 1);
 
         if(startingScript.startTimer == true)
         {

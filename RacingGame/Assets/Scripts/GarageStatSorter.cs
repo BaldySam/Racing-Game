@@ -11,6 +11,7 @@ public class GarageStatSorter : MonoBehaviour
     [SerializeField] private TMP_Text brakingText;
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private TMP_Text damageText;
+    [SerializeField] private TMP_Text errorText;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +36,11 @@ public class GarageStatSorter : MonoBehaviour
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.Grip.x) * 10;
             PlayerStats.Grip.x += 1;
         }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
+        }
     }
     public void OnUpgradeAcceleration()
     {
@@ -42,6 +48,11 @@ public class GarageStatSorter : MonoBehaviour
         {
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.Acceleration.x) * 10;
             PlayerStats.Acceleration.x += 1;
+        }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
         }
     }
     public void OnUpgradeTopSpeed()
@@ -51,6 +62,11 @@ public class GarageStatSorter : MonoBehaviour
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.TopSpeed.x) * 10;
             PlayerStats.TopSpeed.x += 1;
         }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
+        }
     }
     public void OnUpgradeBraking()
     {
@@ -58,6 +74,11 @@ public class GarageStatSorter : MonoBehaviour
         {
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.Braking.x) * 10;
             PlayerStats.Braking.x += 1;
+        }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
         }
     }
     public void OnUpgradeHealth()
@@ -67,6 +88,11 @@ public class GarageStatSorter : MonoBehaviour
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.Health.x) * 10;
             PlayerStats.Health.x += 1;
         }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
+        }
     }
     public void OnUpgradeDamage()
     {
@@ -75,5 +101,16 @@ public class GarageStatSorter : MonoBehaviour
             PlayerStats.Money -= Mathf.RoundToInt(PlayerStats.Damage.x) * 10;
             PlayerStats.Damage.x += 1;
         }
+        else
+        {
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
+        }
+    }
+
+    IEnumerator WaitForSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        errorText.text = "";
     }
 }

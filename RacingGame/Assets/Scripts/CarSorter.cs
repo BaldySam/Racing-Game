@@ -5,13 +5,13 @@ using UnityEngine;
 public class CarSorter : MonoBehaviour
 {
     CarControl carControl;
-    float baseTorque = 300f;
-    float torqueMultiplier = 100f;
-    float baseBrakeTorque = 150f;
-    float brakeTorqueMultiplier = 50f;
-    float baseMaxSpeed = 40f;
-    float maxSpeedMultiplier = 10f;
-    float baseGrip = 10f;
+    float baseTorque = 800f;
+    float torqueMultiplier = 250f;
+    float baseBrakeTorque = 500f;
+    float brakeTorqueMultiplier = 150f;
+    float baseMaxSpeed = 60f;
+    float maxSpeedMultiplier = 4f;
+    float baseGrip = 6f;
     float gripMultiplier = 3;
     private WheelCollider[] wheels;
     // Start is called before the first frame update
@@ -30,7 +30,7 @@ public class CarSorter : MonoBehaviour
             WheelFrictionCurve sidewaysFrictionCurve = wheel.sidewaysFriction;
 
             // Set the extremum slip for the sideways friction
-            sidewaysFrictionCurve.extremumSlip = (baseGrip + (PlayerStats.Grip.x * gripMultiplier)) / 2; // Example value: adjust as needed
+            sidewaysFrictionCurve.extremumSlip = (baseGrip + (PlayerStats.Grip.x * gripMultiplier)) / 4; // Example value: adjust as needed
             sidewaysFrictionCurve.extremumValue = baseGrip + (PlayerStats.Grip.x * gripMultiplier); // Example value: adjust as needed
 
             // Update the wheel collider with the modified curve

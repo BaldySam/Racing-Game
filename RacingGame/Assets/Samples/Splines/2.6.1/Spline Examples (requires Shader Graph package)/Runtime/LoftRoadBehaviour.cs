@@ -461,7 +461,6 @@ namespace Unity.Splines.Examples
             {
                 for (int i = 0, n = prevVertexCount; i < triangleCount; i += 6, n += 2)
                 {
-                    Debug.Log(n);
                     // Top Face
                     m_Indices.Add((n + 2) % (prevVertexCount + vertexCount));
                     m_Indices.Add((n + 1) % (prevVertexCount + vertexCount));

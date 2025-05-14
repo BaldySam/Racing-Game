@@ -8,11 +8,13 @@ public class CarMarketCarStats : MonoBehaviour
     [SerializeField] private MoveAlong moveAlong;
     [SerializeField] private CarValues[] carValues;
     [SerializeField] private TMP_Text statsText;
+    [SerializeField] private TMP_Text errorText;
+    [SerializeField] private TMP_Text buyText;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        buyText.text = "";
     }
 
     // Update is called once per frame
@@ -47,11 +49,26 @@ public class CarMarketCarStats : MonoBehaviour
             PlayerStats.Braking = carValues[moveAlong.selectedMove].braking;
             PlayerStats.Health = carValues[moveAlong.selectedMove].health;
             PlayerStats.Damage = carValues[moveAlong.selectedMove].damage;
+            buyText.text = "Purchased!";
+            StartCoroutine(BuyWaitForSeconds(3));
         }
         else
         {
-            Debug.Log("Not enough money to purchase this car.");
+            errorText.text = "Not enough money!";
+            StartCoroutine(WaitForSeconds(3));
         }
+    }
+
+    IEnumerator WaitForSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        errorText.text = "";
+    }
+
+    IEnumerator BuyWaitForSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        buyText.text = "";
     }
 }
 

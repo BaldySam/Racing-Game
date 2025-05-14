@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class MainMenuManager : MonoBehaviour
     public Canvas Garage;
     public Canvas CarMarket;
     public Canvas Options;
+    [SerializeField] private TMP_Text errorText;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,11 @@ public class MainMenuManager : MonoBehaviour
             Garage.enabled = false;
             CarMarket.enabled = false;
             Options.enabled = false;
+        }
+        else
+        {
+            errorText.text = "You must buy a car first.";
+            StartCoroutine(WaitForSeconds(3));
         }
     }
 
@@ -72,5 +79,11 @@ public class MainMenuManager : MonoBehaviour
         Garage.enabled = false;
         CarMarket.enabled = false;
         Options.enabled = false;
+    }
+
+    IEnumerator WaitForSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        errorText.text = "";
     }
 }

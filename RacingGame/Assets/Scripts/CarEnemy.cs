@@ -265,7 +265,6 @@ public class CarEnemy : MonoBehaviour
     {
         if (collision.gameObject.tag != "Road" && collision.gameObject.tag != "EnemyRacer" && collision.gameObject.tag != "CheckpointHolder" && collision.gameObject.tag != "Ignore")
         {
-            Debug.Log(collision + collision.tag);
             offroadTime += Time.deltaTime;
             if (offroadTime > 5)
             {

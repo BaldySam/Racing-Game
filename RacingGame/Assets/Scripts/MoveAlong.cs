@@ -5,13 +5,13 @@ using UnityEngine;
 public class MoveAlong : MonoBehaviour
 {
     [SerializeField] private float amountOfMoves;
-    int targetMove = 0;
+    int targetMove = -1;
     public int selectedMove;
     int targetMovement = -32;
     // Start is called before the first frame update
     void Start()
     {
-        
+        ToTarget();
     }
 
     // Update is called once per frame
