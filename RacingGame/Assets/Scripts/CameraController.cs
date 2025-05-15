@@ -17,7 +17,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector2 yClamp;
 
     [Header("Camera Sensitivity")]
-    [SerializeField] private float firstPersonSensitivity;
+    [SerializeField] private float firstPersonSensitivityX;
+    [SerializeField] private float firstPersonSensitivityY;
 
     [Header("Follow Camera")]
 
@@ -30,7 +31,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Transform car;
 
     [Header("Adjustments")]
-    [SerializeField] private float followSensitivity;
+    [SerializeField] private float followSensitivityX;
+    [SerializeField] private float followSensitivityY;
     [SerializeField] private Vector2 zoomRange;
     [SerializeField] private float smoothing = 5.0f;
 
@@ -40,6 +42,12 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        firstPersonSensitivityX = PlayerStats.cameraSensitivityX;
+        firstPersonSensitivityY = PlayerStats.cameraSensitivityY;
+
+        followSensitivityX = (PlayerStats.cameraSensitivityX / 5) * 3;
+        followSensitivityY = (PlayerStats.cameraSensitivityY / 5) * 3;
+
         Cursor.lockState = CursorLockMode.Locked;
         cam = transform;
 
@@ -91,8 +99,8 @@ public class CameraController : MonoBehaviour
         cam.parent = firstPersonTransform;
 
         // Gets the mouse inputs
-        mouseX += Input.GetAxis("Mouse X") * firstPersonSensitivity * Time.deltaTime;
-        mouseY -= Input.GetAxis("Mouse Y") * firstPersonSensitivity * Time.deltaTime;
+        mouseX += Input.GetAxis("Mouse X") * firstPersonSensitivityX * Time.deltaTime;
+        mouseY -= Input.GetAxis("Mouse Y") * firstPersonSensitivityY * Time.deltaTime * (PlayerStats.InvertFPY ? -1 : 1);
 
         // Clamps the mouse inputs
         mouseY = Mathf.Clamp(mouseY, yClamp.x, yClamp.y);
@@ -117,8 +125,8 @@ public class CameraController : MonoBehaviour
         if(Input.GetMouseButton(1))
         {
             // Gets the mouse inputs
-            mouseX += Input.GetAxis("Mouse X") * Time.deltaTime * followSensitivity;
-            mouseY -= Input.GetAxis("Mouse Y") * Time.deltaTime * followSensitivity;
+            mouseX += Input.GetAxis("Mouse X") * Time.deltaTime * followSensitivityX;
+            mouseY += Input.GetAxis("Mouse Y") * Time.deltaTime * followSensitivityY * (PlayerStats.InvertTPY ? -1 : 1);
         }
         else
         {

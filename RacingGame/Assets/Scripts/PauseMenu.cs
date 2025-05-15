@@ -48,4 +48,10 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1;
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
+
+    public void OnRestart()
+    {
+        Time.timeScale = 1;
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+    }
 }

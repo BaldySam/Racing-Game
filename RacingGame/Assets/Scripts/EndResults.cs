@@ -18,6 +18,7 @@ public class EndResults : MonoBehaviour
     [SerializeField] TMP_Text finalRaceText;
     [SerializeField] PauseMenu pauseMenu;
     [SerializeField] int trackNumber;
+    public bool AIFinished;
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +34,7 @@ public class EndResults : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(playerCheckpointSorter.currentLap == playerCheckpointSorter.maxLaps && ended == false)
+        if(playerCheckpointSorter.currentLap == playerCheckpointSorter.maxLaps && ended == false || AIFinished)
         {
             ended = true;
             pauseMenu.canPause = false;
@@ -47,7 +48,7 @@ public class EndResults : MonoBehaviour
             {
                 if(positionFinished == 1)
                 {
-                    PlayerStats.Money += moneyEarned * 2;
+                    PlayerStats.Money += moneyEarned;
                     finalRaceText.text = "YOU ARE THE FASTEST RACER";
                 }
                 else

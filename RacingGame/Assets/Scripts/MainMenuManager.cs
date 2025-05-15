@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class MainMenuManager : MonoBehaviour
@@ -11,10 +12,14 @@ public class MainMenuManager : MonoBehaviour
     public Canvas CarMarket;
     public Canvas Options;
     [SerializeField] private TMP_Text errorText;
+    [SerializeField] private Image tickImage;
+    [SerializeField] private Image tickImage2;
     // Start is called before the first frame update
     void Start()
     {
         OnMainMenu();
+        tickImage.enabled = PlayerStats.InvertFPY;
+        tickImage2.enabled = PlayerStats.InvertTPY;
     }
 
     // Update is called once per frame
@@ -79,6 +84,18 @@ public class MainMenuManager : MonoBehaviour
         Garage.enabled = false;
         CarMarket.enabled = false;
         Options.enabled = false;
+    }
+
+    public void OnInvertFPY()
+    {
+        PlayerStats.InvertFPY = !PlayerStats.InvertFPY;
+        tickImage.enabled = PlayerStats.InvertFPY;
+    }
+
+    public void OnInvertTPY()
+    {
+        PlayerStats.InvertTPY = !PlayerStats.InvertTPY;
+        tickImage2.enabled = PlayerStats.InvertTPY;
     }
 
     IEnumerator WaitForSeconds(float seconds)

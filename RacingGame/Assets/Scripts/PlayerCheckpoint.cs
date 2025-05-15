@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerCheckpoint : MonoBehaviour
 {
     PlayerCheckpointSorter playerCheckpointSorter;
+    [SerializeField] bool isFinishLine;
+    [SerializeField] EndResults endResults;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +28,10 @@ public class PlayerCheckpoint : MonoBehaviour
         {
             if(gameObject == playerCheckpointSorter.checkpoints[other.transform.parent.GetComponent<CarEnemy>().currentCheckpoint])
             {
+                if(isFinishLine)
+                {
+                    endResults.AIFinished = true;
+                }
                 other.transform.parent.GetComponent<CarEnemy>().currentCheckpoint ++;
             }
         }

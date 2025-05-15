@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using Unity.PlasticSCM.Editor.WebApi;
 
 public class PlayerCheckpointSorter : MonoBehaviour
 {

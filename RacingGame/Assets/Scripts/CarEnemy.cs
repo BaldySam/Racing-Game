@@ -78,6 +78,11 @@ public class CarEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Vector3.Distance(transform.position, agentObject.transform.position) > 10f)
+        {
+            transform.position = agentObject.transform.position;
+        }
+
         if(!isPolice)
         {
             maxCheckpoints = playerCheckpointSorter.maxCheckpoints;

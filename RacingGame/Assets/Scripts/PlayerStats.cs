@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class PlayerStats : MonoBehaviour
     public static Vector2 Damage = new Vector2(0, 0);
     public static bool TrackOneComplete = false;
     public static bool TracktwoComplete = false;
+    public static bool InvertFPY;
+    public static bool InvertTPY;
+    public static float cameraSensitivityX = 500f;
+    public static float cameraSensitivityY = 500f;
 
     // Start is called before the first frame update
     void Start()
